@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>2ND SEC TERM 1 — Unit 1 Platform</title>
+<style>
+  :root{
+    /* Vibrant palette for Unit 1 */
+    --u1-prim:#00c2a8;      /* aqua */
+    --u1-prim-2:#7fffd4;    /* aquamarine */
+    --u1-accent:#ff7ab8;    /* pink */
+    --u1-warm:#ffd166;      /* warm yellow */
+    --u1-violet:#9b8cfc;    /* violet */
+    --bg:#f6fbff; --card:#ffffff; --text:#0f2e3a; --muted:#5a7b86; --ok:#2ecc71; --bad:#ff5a5a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu; background:var(--bg); color:var(--text)}
+  header{background:linear-gradient(120deg,var(--u1-prim),var(--u1-prim-2)); color:#fff; padding:16px 12px; position:sticky; top:0; z-index:20; box-shadow:0 10px 24px rgba(0,0,0,.12)}
+  .row{display:flex; gap:10px; align-items:center; justify-content:space-between}
+  .brand{display:flex; gap:10px; align-items:center}
+  .title{font-weight:900; font-size:18px}
+  .small{opacity:.95; font-size:13px}
+  .tabs{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+  .tab{border:none; background:#fff; color:var(--text); padding:10px 14px; border-radius:12px; font-weight:700; box-shadow:0 8px 20px rgba(0,0,0,.06); cursor:pointer}
+  .tab.active{background:var(--u1-prim); color:#fff}
+  .share{border:none; background:var(--u1-accent); color:#fff; padding:10px 12px; border-radius:10px; font-weight:800; cursor:pointer; box-shadow:0 8px 18px rgba(255,122,184,.35)}
+  main{padding:12px}
+  .panel{display:none}
+  .panel.active{display:block}
+  /* inner lesson tabs */
+  .subtabs{display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 12px}
+  .sub{border:none; background:#fff; color:var(--text); padding:8px 12px; border-radius:999px; font-weight:700; box-shadow:0 6px 16px rgba(0,0,0,.06); cursor:pointer}
+  .sub.active{background:var(--u1-violet); color:#fff}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px}
+  .card{background:var(--card); border-radius:12px; padding:12px; box-shadow:0 12px 28px rgba(0,0,0,.06)}
+  .word{font-size:20px; font-weight:900}
+  .arabic{color:var(--muted); font-size:14px}
+  .example{margin-top:6px; font-size:14px}
+  .btn{border:none; background:var(--u1-prim); color:#fff; padding:8px 10px; border-radius:10px; font-weight:800; cursor:pointer}
+  .btn.out{background:#fff; color:var(--u1-prim); border:2px solid var(--u1-prim)}
+  .dict{background:#fff; border-radius:12px; padding:12px; margin-top:12px}
+  .dict .rowi{display:flex; gap:8px; align-items:center; margin:6px 0}
+  .dict input{flex:1; padding:8px 10px; border-radius:8px; border:2px solid #e8f2f5}
+  .match{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+  .pile{background:#fff; border-radius:12px; padding:12px; min-height:220px}
+  .draggable{background:#f8fbff; border:2px dashed #d7eaf0; padding:8px 10px; border-radius:10px; margin:6px 0; cursor:grab}
+  .slot{background:#f8fbff; border:2px dashed #d7eaf0; padding:10px; border-radius:10px; margin:6px 0; min-height:42px}
+  .slot.filled{border-color:var(--ok); background:#eafff3}
+  .quiz{background:#fff; border-radius:12px; padding:12px}
+  .choices{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:8px; margin-top:6px}
+  .choice{background:#f9fcff; border:2px solid transparent; padding:12px; border-radius:12px; cursor:pointer; font-weight:800}
+  .choice.ok{border-color:var(--ok); background:#ecfff3}
+  .choice.bad{border-color:var(--bad); background:#ffefef}
+  .sent{display:flex; align-items:center; gap:8px; margin:8px 0; background:#fff; padding:10px; border-radius:10px}
+  select{padding:6px 10px; border-radius:8px}
+  .exam{background:#fff; border-radius:12px; padding:12px}
+  .item{padding:10px; border:1px dashed #d9e6ea; border-radius:10px; margin:8px 0}
+  .pill{padding:6px 10px; border-radius:999px; background:#eef8ff; display:inline-block; margin:6px 0}
+  .toast{position:fixed; right:12px; bottom:12px; background:#000c; color:#fff; padding:8px 12px; border-radius:10px; font-weight:700; display:none}
+  @media(max-width:640px){.match{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="row">
+    <div class="brand">
+      <div class="title">2ND SEC TERM 1 — Unit 1: Egypt–Africa Cooperation</div>
+      <span class="small">Designed for <strong>Asmaa Mahmoud El‑Hagarsi</strong> • en‑GB voice • Mobile</span>
+    </div>
+    <button class="share" id="shareBtn">🔗 Share</button>
+  </div>
+  <div class="tabs" id="tabs"></div>
+</header>
+<main id="content"></main>
+<div class="toast" id="toast"></div>
+<script>
+// ====== Data (short demo for Unit 1) ======
+const lessons=[
+  {title:'Lesson 1', vocab:[
+    {w:'gateway', ar:'بوابة', ex:'Egypt is a gateway to Africa.'},
+    {w:'infrastructure', ar:'بنية تحتية', ex:'Infrastructure connects countries.'},
+    {w:'partnership', ar:'شراكة', ex:'They built a strong partnership.'},
+    {w:'stability', ar:'استقرار', ex:'Regional stability matters.'},
+    {w:'manufactured', ar:'مصنّع', ex:'Egypt exports manufactured goods.'},
+    {w:'textiles', ar:'منسوجات', ex:'The factory makes textiles.'},
+    {w:'mutual', ar:'متبادل', ex:'Mutual trust is important.'},
+    {w:'scholarship', ar:'منحة دراسية', ex:'She won a scholarship.'},
+    {w:'convoy', ar:'قافلة طبية', ex:'A medical convoy arrived.'},
+    {w:'capacity', ar:'قدرة', ex:'Training builds capacity.'}
+  ], sentences:[
+    'Egypt is strengthening ties with African countries.',
+    'New infrastructure projects are being launched.',
+    'Trade in textiles and manufactured goods is growing.',
+    'Scholarships support African students.',
+    'Medical convoys are training local staff.',
+    'Partnerships build mutual trust and stability.'
+  ]},
+  {title:'Lesson 2', vocab:[
+    {w:'integration', ar:'اندماج', ex:'Integration supports growth.'},
+    {w:'hybrid', ar:'هجيني', ex:'A hybrid solution works.'},
+    {w:'expanding', ar:'يتوسّع', ex:'The project is expanding.'},
+    {w:'rural', ar:'ريفي', ex:'Rural areas need support.'},
+    {w:'stable', ar:'مستقر', ex:'A stable plan helps.'},
+    {w:'funding', ar:'تمويل', ex:'Funding is required.'},
+    {w:'renewable', ar:'متجدد', ex:'Renewable energy grows.'},
+    {w:'irrigation', ar:'ريّ', ex:'Solar irrigation saves water.'},
+    {w:'partnerships', ar:'شراكات', ex:'Partnerships share knowledge.'},
+    {w:'coverage', ar:'تغطية', ex:'Coverage is improving.'}
+  ], sentences:[
+    'Experts discuss trade with Sub‑Saharan countries.',
+    'Solar irrigation supports rural farming.',
+    'Hybrid solutions add flexibility.',
+    'Funding helps expand projects.',
+    'Stable plans ensure success.',
+    'Integration brings ideas together.'
+  ]},
+  {title:'Lesson 3', vocab:[
+    {w:'launch', ar:'إطلاق', ex:'We are launching a project.'},
+    {w:'provide', ar:'يوفّر', ex:'Doctors are providing care.'},
+    {w:'pave', ar:'يمهّد', ex:'Roads are being paved.'},
+    {w:'carry out', ar:'ينفّذ', ex:'Plans are being carried out.'},
+    {w:'being built', ar:'يُبنى الآن', ex:'A bridge is being built.'},
+    {w:'being cleaned', ar:'يُنظّف الآن', ex:'Streets are being cleaned.'},
+    {w:'arrangement', ar:'ترتيب', ex:'We are making arrangements.'},
+    {w:'studying', ar:'يذاكر', ex:'Students are studying now.'},
+    {w:'cooperating', ar:'يتعاون', ex:'Teams are cooperating.'},
+    {w:'scheduled', ar:'مجدول', ex:'The meeting is scheduled.'}
+  ], sentences:[
+    'New projects are being launched across Africa.',
+    'Bridges of trust are being built.',
+    'Doctors are providing care in clinics.',
+    'Roads are being paved today.',
+    'Students are studying this week.',
+    'Plans are being carried out.'
+  ],
+  grammar:{
+    title:'Present Continuous — Active & Passive',
+    drills:[
+      {q:'They ___ a new bridge now.', opts:['build','are building','is built','are built'], ok:1},
+      {q:'English ___ in many schools right now.', opts:['is teaching','are teaching','is being taught','is taught'], ok:2},
+      {q:'The roads ___ because of heavy rain today.', opts:['are cleaning','is being cleaned','are being cleaned','was cleaned'], ok:2}
+    ]
+  }},
+  {title:'Lesson 4', vocab:[
+    {w:'enhance', ar:'يعزز', ex:'Training enhances skills.'},
+    {w:'yields', ar:'إنتاجية', ex:'Irrigation increases yields.'},
+    {w:'targeted', ar:'مستهدفة', ex:'Targeted support works.'},
+    {w:'milestone', ar:'محطة فارقة', ex:'A big milestone.'},
+    {w:'capacity', ar:'قدرات', ex:'Building capacity helps.'},
+    {w:'collaboration', ar:'تعاون', ex:'Collaboration drives progress.'},
+    {w:'annual', ar:'سنوي', ex:'An annual festival.'},
+    {w:'renewable', ar:'متجددة', ex:'Renewable projects create jobs.'},
+    {w:'empower', ar:'يمكّن', ex:'Training empowers people.'},
+    {w:'prosperous', ar:'مزدهر', ex:'A prosperous future.'}
+  ], sentences:[
+    'Agricultural projects enhance yields.',
+    'A dam became a milestone.',
+    'Medical teams build capacity.',
+    'Solar factories create jobs.',
+    'The annual festival builds exchange.',
+    'Partnerships empower communities.'
+  ]}
+];
+
+const unitExam = {items:[
+  {q:'Egypt’s strategic location makes it a ____ between Africa and the Middle East.', opts:['barrier','gateway','obstacle','border'], ok:1},
+  {q:'New houses ____ quickly in this area.', opts:['are being built','is built','are building','was built'], ok:0},
+  {q:'Present continuous passive: A bridge ___ across the river.', opts:['is being built','are building','was built','build'], ok:0}
+]};
+
+// ====== UI utils ======
+const tabs = document.getElementById('tabs');
+const content = document.getElementById('content');
+const toast = document.getElementById('toast');
+function showToast(t){toast.textContent=t; toast.style.display='block'; setTimeout(()=>toast.style.display='none',1500)}
+function speak(t){const u=new SpeechSynthesisUtterance(t); const vs=speechSynthesis.getVoices(); u.lang='en-GB'; u.rate=.9; const v=vs.find(v=>/en-GB/.test(v.lang))||vs[0]; if(v) u.voice=v; speechSynthesis.cancel(); speechSynthesis.speak(u)}
+function cheer(ok){const ctx=new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.type= ok?'triangle':'sawtooth'; o.frequency.value= ok?880:220; o.connect(g); g.connect(ctx.destination); g.gain.value=.0001; g.gain.exponentialRampToValueAtTime(.3, ctx.currentTime+.02); g.gain.exponentialRampToValueAtTime(.0001, ctx.currentTime+.35); o.start(); o.stop(ctx.currentTime+.37)}
+
+// ====== Build top tabs
+const tabNames=['Lesson 1','Lesson 2','Lesson 3','Lesson 4','Unit Exam'];
+const panels=[];
+for(let i=0;i<tabNames.length;i++){
+  const b=document.createElement('button'); b.className='tab'; b.textContent=tabNames[i]; b.onclick=()=>activate(i); tabs.appendChild(b);
+  const p=document.createElement('section'); p.className='panel'; content.appendChild(p); panels.push(p);
+}
+function activate(i){[...tabs.children].forEach((b,idx)=>b.classList.toggle('active',idx===i)); panels.forEach((p,idx)=>p.classList.toggle('active',idx===i));}
+
+// ====== Build lesson panels
+function card(w){ const d=document.createElement('div'); d.className='card'; d.innerHTML=`<div class='word'>${w.w}</div><div class='arabic'>${w.ar}</div><div class='example'>${w.ex}</div>`; const tools=document.createElement('div'); tools.style.marginTop='8px'; const b1=document.createElement('button'); b1.className='btn'; b1.textContent='🔊 Word'; b1.onclick=()=>speak(w.w); const b2=document.createElement('button'); b2.className='btn out'; b2.textContent='🔊 Example'; b2.onclick=()=>speak(w.ex); tools.append(b1,b2); d.appendChild(tools); return d }
+function dictation(words){ const wrap=document.createElement('div'); wrap.className='dict'; const h=document.createElement('h3'); h.textContent='Dictation (Arabic → English)'; wrap.appendChild(h); words.forEach(w=>{const r=document.createElement('div'); r.className='rowi'; r.innerHTML=`<span class='pill'>${w.ar}</span><input placeholder='type the word'><button class='btn'>Check</button>`; const btn=r.querySelector('button'); const inp=r.querySelector('input'); btn.onclick=()=>{ if(inp.value.trim().toLowerCase()==w.w.toLowerCase()){cheer(true); showToast('Great!'); speak('Great job');} else {cheer(false); showToast('Try again'); speak(w.w);} }; wrap.appendChild(r)}); return wrap }
+function matching(words){ const wrap=document.createElement('div'); wrap.className='match'; const left=document.createElement('div'); left.className='pile'; const right=document.createElement('div'); right.className='pile'; wrap.append(left,right); const a=[...words].sort(()=>Math.random()-0.5); a.forEach(w=>{const s=document.createElement('div'); s.className='slot'; s.dataset.t=w.w.toLowerCase(); s.textContent=w.ar; right.appendChild(s)}); const b=[...words].sort(()=>Math.random()-0.5); b.forEach(w=>{const d=document.createElement('div'); d.className='draggable'; d.draggable=true; d.textContent=w.w; d.dataset.w=w.w.toLowerCase(); d.addEventListener('dragstart',e=>e.dataTransfer.setData('text', d.dataset.w)); left.appendChild(d)}); right.querySelectorAll('.slot').forEach(s=>{s.addEventListener('dragover',e=>e.preventDefault()); s.addEventListener('drop',e=>{const ww=e.dataTransfer.getData('text'); const ok= ww===s.dataset.t; if(ok){s.classList.add('filled'); s.textContent=s.textContent+'  ✅ '+ww; cheer(true); showToast('Matched!')} else {cheer(false); showToast('Not a match')}})}); return wrap }
+function kahoot(words){ const q=document.createElement('div'); q.className='quiz'; const h=document.createElement('h3'); h.textContent='Kahoot‑style Quiz'; q.appendChild(h); const set=[...words].sort(()=>Math.random()-0.5).slice(0,8); set.forEach(it=>{const box=document.createElement('div'); box.style.margin='8px 0'; const prompt=document.createElement('div'); prompt.style.fontWeight='900'; prompt.textContent=it.ar; box.appendChild(prompt); const choices=document.createElement('div'); choices.className='choices'; box.appendChild(choices); const pool=[it.w, ...words.filter(x=>x.w!==it.w).slice(0,3).map(x=>x.w)]; pool.sort(()=>Math.random()-0.5); pool.forEach(text=>{const c=document.createElement('div'); c.className='choice'; c.textContent=text; c.onclick=()=>{const ok=text===it.w; c.classList.add(ok?'ok':'bad'); cheer(ok);}; choices.appendChild(c)}); q.appendChild(box)}); return q }
+function reading(sentences){ const wrap=document.createElement('div'); const h=document.createElement('h3'); h.textContent='Reading — 6 short sentences'; wrap.appendChild(h); sentences.forEach(s=>{const row=document.createElement('div'); row.className='sent'; const b=document.createElement('button'); b.className='btn'; b.textContent='🔊'; b.onclick=()=>speak(s); const span=document.createElement('span'); span.textContent=s; const sel=document.createElement('select'); const kw = s.split(' ').find(w=>w.length>6) || 'Egypt'; const opts=[kw,'project','Africa','students'].sort(()=>Math.random()-0.5); opts.forEach(o=>{const op=document.createElement('option'); op.value=o; op.textContent=o; sel.appendChild(op)}); sel.onchange=()=>{const ok= sel.value===kw; cheer(ok); showToast(ok?'Great!':'Try again')}; row.append(b,span,sel); wrap.appendChild(row)}); return wrap }
+function grammar(g){ const wrap=document.createElement('div'); wrap.className='card'; const h=document.createElement('h3'); h.textContent=g.title; wrap.appendChild(h); g.drills.forEach(d=>{const item=document.createElement('div'); item.className='item'; const q=document.createElement('div'); q.style.fontWeight='800'; q.textContent=d.q; item.appendChild(q); const box=document.createElement('div'); d.opts.map((t,i)=>({t,i})).sort(()=>Math.random()-0.5).forEach(({t,i})=>{const c=document.createElement('div'); c.className='choice'; c.textContent=t; c.onclick=()=>{const ok = i===d.ok; c.classList.add(ok?'ok':'bad'); cheer(ok)}; box.appendChild(c)}); item.appendChild(box); wrap.appendChild(item)}); return wrap }
+function lessonPanel(lesson){ const panel=document.createElement('section'); const subt=document.createElement('div'); subt.className='subtabs'; panel.appendChild(subt); const names=['Vocabulary','Games','Reading','Exam']; if(lesson.grammar) names.splice(2,0,'Grammar'); const views=names.map(()=>{const v=document.createElement('div'); panel.appendChild(v); return v}); function act(i){[...subt.children].forEach((b,idx)=>b.classList.toggle('active',idx===i)); views.forEach((v,idx)=>v.style.display= idx===i?'block':'none')} names.forEach((n,i)=>{const b=document.createElement('button'); b.className='sub'; b.textContent=n; b.onclick=()=>act(i); subt.appendChild(b)}); const grid=document.createElement('div'); grid.className='grid'; lesson.vocab.forEach(w=>grid.appendChild(card(w))); views[names.indexOf('Vocabulary')].appendChild(grid); views[names.indexOf('Vocabulary')].appendChild(dictation(lesson.vocab)); const games=document.createElement('div'); games.appendChild(matching(lesson.vocab)); games.appendChild(document.createElement('hr')); games.appendChild(kahoot(lesson.vocab)); views[names.indexOf('Games')].appendChild(games); if(lesson.grammar){views[names.indexOf('Grammar')].appendChild(grammar(lesson.grammar));} views[names.indexOf('Reading')].appendChild(reading(lesson.sentences)); const mini={items: lesson.vocab.slice(0,5).map(v=>({q:'Pick the English word: '+v.ar, opts:[v.w, ...lesson.vocab.filter(x=>x.w!==v.w).slice(0,3).map(x=>x.w)], ok:0}))}; views[names.indexOf('Exam')].appendChild(unitExamView(mini)); act(0); return panel }
+function unitExamView(exam){ const wrap=document.createElement('div'); wrap.className='exam'; const h=document.createElement('h3'); h.textContent='Lesson/Unit Exam'; wrap.appendChild(h); let score=0; const scoreBox=document.createElement('div'); scoreBox.className='pill'; scoreBox.textContent='Score: 0/'+exam.items.length; wrap.appendChild(scoreBox); exam.items.forEach((itm,idx)=>{const item=document.createElement('div'); item.className='item'; const qq=document.createElement('div'); qq.style.fontWeight='800'; qq.textContent=(idx+1)+'. '+itm.q; item.appendChild(qq); const opts=document.createElement('div'); item.appendChild(opts); itm.opts.map((t,i)=>({t,i})).sort(()=>Math.random()-0.5).forEach(({t,i})=>{const c=document.createElement('div'); c.className='choice'; c.textContent=t; c.onclick=()=>{const ok= i===itm.ok; c.classList.add(ok?'ok':'bad'); cheer(ok); if(ok){score++; scoreBox.textContent='Score: '+score+'/'+exam.items.length} else {alert('Correct: '+itm.opts[itm.ok])}}; opts.appendChild(c)}); wrap.appendChild(item)}); const reset=document.createElement('button'); reset.className='btn'; reset.textContent='Reset'; reset.onclick=()=>{wrap.parentElement.replaceChild(unitExamView(exam), wrap)}; wrap.appendChild(reset); return wrap }
+
+// mount lessons
+lessons.forEach((lsn,idx)=>{panels[idx].appendChild(lessonPanel(lsn))});
+// unit exam panel
+panels[4].appendChild(unitExamView(unitExam));
+activate(0);
+
+// Share button
+const shareBtn=document.getElementById('shareBtn');
+shareBtn.addEventListener('click', async ()=>{
+  const url = window.location.href;
+  if(navigator.share){
+    try{ await navigator.share({title:'2ND SEC TERM 1 — Unit 1', text:'Check our interactive mini platform!', url}); showToast('Shared!'); }catch(e){ showToast('Share cancelled'); }
+  } else {
+    try{ await navigator.clipboard.writeText(url); showToast('Link copied to clipboard'); }catch(e){ showToast('Copy the URL manually'); }
+  }
+});
+</script>
+</body>
+</html>
